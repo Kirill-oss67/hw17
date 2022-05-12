@@ -53,5 +53,17 @@ movie_ns = api.namespace('movies')
 
 db.create_all()
 
+@movie_ns.route('/')
+class MoviesView(Resource):
+    def get(self):
+        all_movies = Movie.query.all()
+        return movies_schema.dump(all_movies), 200
+
+@movie_ns.route('/<int:id>')
+class MovieView(Resource):
+    def get(self,id):
+        movie = Movie.query.get(id)
+        return movie_schema.dump(movie), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
