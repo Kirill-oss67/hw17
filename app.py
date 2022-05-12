@@ -8,6 +8,7 @@ from marshmallow import Schema, fields
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JSON_AS_ASCII'] = False
 db = SQLAlchemy(app)
 
 
@@ -35,7 +36,22 @@ class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
+class MovieSchema(Schema):
+    id = fields.Int(dump_only=True)
+    title = fields.Str()
+    description = fields.Str()
+    trailer = fields.Str()
+    year = fields.Int()
+    rating = fields.Float()
+    genre_id = fields.Int()
 
+movie_schema = MovieSchema()
+movies_schema = MovieSchema(many=True)
+
+api = Api(app)
+movie_ns = api.namespace('movies')
+
+db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
