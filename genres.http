@@ -1,0 +1,44 @@
+POST http://localhost:5000/genres/
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+###
+
+GET http://localhost:5000/genres/
+Accept: application/json
+
+###
+
+GET http://localhost:5000/genres/1
+Accept: application/json
+
+###
+
+PUT http://localhost:5000/genres/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+###
+
+DELETE http://localhost:5000/genres/1
+Accept: application/json
+
+###
+
+PATCH http://localhost:5000/genres/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+
+###

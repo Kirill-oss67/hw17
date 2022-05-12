@@ -1,0 +1,54 @@
+POST http://localhost:5000/movies/
+Content-Type: application/json
+
+{
+  "title": "title",
+  "description": "description",
+  "trailer": "trailer",
+  "year": 1222,
+  "rating": 1,
+  "genre_id": 1,
+  "director_id": 1
+}
+
+###
+
+GET http://localhost:5000/movies/
+Accept: application/json
+
+###
+
+GET http://localhost:5000/movies/1
+Accept: application/json
+
+###
+
+PUT http://localhost:5000/movies/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "title": "GOVNO",
+  "description": "description",
+  "trailer": "trailer",
+  "year": 1222,
+  "rating": 1,
+  "genre_id": 1,
+  "director_id": 1
+}
+###
+
+DELETE http://localhost:5000/movies/1
+Accept: application/json
+
+###
+
+PATCH http://localhost:5000/movies/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "title": "STRASHNO"
+}
+
+###

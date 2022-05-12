@@ -1,0 +1,43 @@
+POST http://localhost:5000/directors/
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+###
+
+GET http://localhost:5000/directors/
+Accept: application/json
+
+###
+
+GET http://localhost:5000/directors/43333
+Accept: application/json
+
+###
+
+PUT http://localhost:5000/directors/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+###
+
+DELETE http://localhost:5000/directors/1
+Accept: application/json
+
+###
+
+PATCH http://localhost:5000/directors/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "superka"
+}
+
+###
