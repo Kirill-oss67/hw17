@@ -96,12 +96,12 @@ class DirectorView(Resource):
         all_directors = Director.query.all()
         return directors_schema.dump(all_directors), 200
 
+
 @director_ns.route('/<int:id>')
 class DirectorView(Resource):
     def get(self, id):
         director = Director.query.get(id)
         return director_schema.dump(director), 200
-
 
 
 @movie_ns.route('/')
@@ -110,18 +110,21 @@ class MoviesView(Resource):
         try:
             genre_id = request.args.get('genre_id')  # Получение id жанра
             director_id = request.args.get('director_id')  # Получение id режиссера
+            if director_id and genre_id:
+                movies = Movie.query.filter(Movie.director_id == director_id).filter(Movie.genre_id == genre_id)
+                return movies_schema.dump(movies)
             if genre_id:
                 movies_by_genre = Movie.query.filter(
                     Movie.genre_id == genre_id)  # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
                 return movies_schema.dump(movies_by_genre)
-            elif director_id:
+            if director_id:
                 movies_by_director = Movie.query.filter(
                     Movie.director_id == director_id)  # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
                 return movies_schema.dump(movies_by_director)
             else:
                 all_movies = Movie.query.all()
                 return movies_schema.dump(all_movies), 200
-        except Exception :
+        except Exception:
             return 'неверное значение', 404
 
 
