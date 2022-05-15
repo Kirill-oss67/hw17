@@ -107,23 +107,22 @@ class DirectorView(Resource):
 @movie_ns.route('/')
 class MoviesView(Resource):
     def get(self):
-        genre_id = request.args.get('genre_id')  # Получение id жанра
-        director_id = request.args.get('director_id')  # Получение id режиссера
-        if genre_id:
-            movies_by_genre = Movie.query.filter(
-                Movie.genre_id == genre_id)  # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
-            return movies_schema.dump(movies_by_genre)
-        elif director_id:
-            movies_by_director = Movie.query.filter(
-                Movie.director_id == director_id)  # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
-            return movies_schema.dump(movies_by_director)
-        elif genre_id and director_id:
-            movies_by = db.session.query(Movie).filter(Movie.director_id.like(director_id),
-                                                       Movie.genre_id.like(genre_id))  # ждет доработки
-            return movies_schema.dump(movies_by)
-        else:
-            all_movies = Movie.query.all()
-            return movies_schema.dump(all_movies), 200
+        try:
+            genre_id = request.args.get('genre_id')  # Получение id жанра
+            director_id = request.args.get('director_id')  # Получение id режиссера
+            if genre_id:
+                movies_by_genre = Movie.query.filter(
+                    Movie.genre_id == genre_id)  # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
+                return movies_schema.dump(movies_by_genre)
+            elif director_id:
+                movies_by_director = Movie.query.filter(
+                    Movie.director_id == director_id)  # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
+                return movies_schema.dump(movies_by_director)
+            else:
+                all_movies = Movie.query.all()
+                return movies_schema.dump(all_movies), 200
+        except Exception :
+            return 'неверное значение'
 
 
 @movie_ns.route('/<int:id>')
