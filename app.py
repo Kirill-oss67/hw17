@@ -122,7 +122,7 @@ class MoviesView(Resource):
                 all_movies = Movie.query.all()
                 return movies_schema.dump(all_movies), 200
         except Exception :
-            return 'неверное значение'
+            return 'неверное значение', 404
 
 
 @movie_ns.route('/<int:id>')
