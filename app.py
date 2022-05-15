@@ -1,6 +1,6 @@
 # app.py
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restx import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import Schema, fields
@@ -25,10 +25,16 @@ class Movie(db.Model):
     director_id = db.Column(db.Integer, db.ForeignKey("director.id"))
     director = db.relationship("Director")
 
+
 class Director(db.Model):
     __tablename__ = 'director'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
+
+
+class DirectorSchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
 
 
 class Genre(db.Model):
@@ -36,8 +42,14 @@ class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
+
+class GenreSchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
+
+
 class MovieSchema(Schema):
-    id = fields.Int(dump_only=True)
+    id = fields.Int()
     title = fields.Str()
     description = fields.Str()
     trailer = fields.Str()
@@ -45,25 +57,42 @@ class MovieSchema(Schema):
     rating = fields.Float()
     genre_id = fields.Int()
 
+
 movie_schema = MovieSchema()
 movies_schema = MovieSchema(many=True)
 
 api = Api(app)
+api.app.config['RESTX_JSON'] = {'ensure_ascii': False, 'indent': 4}
+
 movie_ns = api.namespace('movies')
+director_ns = api.namespace('directors')
+genre_ns = api.namespace('genres')
 
 db.create_all()
+
 
 @movie_ns.route('/')
 class MoviesView(Resource):
     def get(self):
-        all_movies = Movie.query.all()
-        return movies_schema.dump(all_movies), 200
+        genre_id = request.args.get('genre_id')    # Получение id жанра
+        director_id = request.args.get('director_id')       # Получение id режиссера
+        if genre_id:
+            movies_by_genre = Movie.query.filter(Movie.genre_id == genre_id)    # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
+            return movies_schema.dump(movies_by_genre)
+        elif director_id:
+            movies_by_director = Movie.query.filter(Movie.director_id == director_id)   # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
+            return movies_schema.dump(movies_by_director)
+        else:
+            all_movies = Movie.query.all()
+            return movies_schema.dump(all_movies), 200
+
 
 @movie_ns.route('/<int:id>')
 class MovieView(Resource):
-    def get(self,id):
+    def get(self, id):
         movie = Movie.query.get(id)
         return movie_schema.dump(movie), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)
