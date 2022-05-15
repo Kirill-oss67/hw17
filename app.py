@@ -56,10 +56,15 @@ class MovieSchema(Schema):
     year = fields.Int()
     rating = fields.Float()
     genre_id = fields.Int()
+    director_id = fields.Int()
 
 
 movie_schema = MovieSchema()
 movies_schema = MovieSchema(many=True)
+genre_schema = GenreSchema()
+genres_schema = GenreSchema(many=True)
+director_schema = DirectorSchema()
+directors_schema = DirectorSchema(many=True)
 
 api = Api(app)
 api.app.config['RESTX_JSON'] = {'ensure_ascii': False, 'indent': 4}
@@ -71,17 +76,51 @@ genre_ns = api.namespace('genres')
 db.create_all()
 
 
+@genre_ns.route('/')
+class GenresView(Resource):
+    def get(self):
+        all_genres = Genre.query.all()
+        return genres_schema.dump(all_genres), 200
+
+
+@genre_ns.route('/<int:id>')
+class GenreView(Resource):
+    def get(self, id):
+        genre = Genre.query.get(id)
+        return genre_schema.dump(genre), 200
+
+
+@director_ns.route("/")
+class DirectorView(Resource):
+    def get(self):
+        all_directors = Director.query.all()
+        return directors_schema.dump(all_directors), 200
+
+@director_ns.route('/<int:id>')
+class DirectorView(Resource):
+    def get(self, id):
+        director = Director.query.get(id)
+        return director_schema.dump(director), 200
+
+
+
 @movie_ns.route('/')
 class MoviesView(Resource):
     def get(self):
-        genre_id = request.args.get('genre_id')    # Получение id жанра
-        director_id = request.args.get('director_id')       # Получение id режиссера
+        genre_id = request.args.get('genre_id')  # Получение id жанра
+        director_id = request.args.get('director_id')  # Получение id режиссера
         if genre_id:
-            movies_by_genre = Movie.query.filter(Movie.genre_id == genre_id)    # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
+            movies_by_genre = Movie.query.filter(
+                Movie.genre_id == genre_id)  # Получение фильмов по запросу где жанр id в модели равен полученному id (шаг 4)
             return movies_schema.dump(movies_by_genre)
         elif director_id:
-            movies_by_director = Movie.query.filter(Movie.director_id == director_id)   # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
+            movies_by_director = Movie.query.filter(
+                Movie.director_id == director_id)  # Получение фильмов по запросу где режиссер id в модели равен полученному id(шаг 3)
             return movies_schema.dump(movies_by_director)
+        elif genre_id and director_id:
+            movies_by = db.session.query(Movie).filter(Movie.director_id.like(director_id),
+                                                       Movie.genre_id.like(genre_id))  # ждет доработки
+            return movies_schema.dump(movies_by)
         else:
             all_movies = Movie.query.all()
             return movies_schema.dump(all_movies), 200
